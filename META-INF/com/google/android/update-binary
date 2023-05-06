@@ -14,7 +14,7 @@ $BOOTMODE || DIR=$(dirname "$ZIPFILE");
 [ $DIR == "/sideload" ] && DIR=/tmp;
 
 [ -d /postinstall/tmp ] && POSTINSTALL=/postinstall;
-[ "$AKHOME" ] || AKHOME=$POSTINSTALL/tmp/anykernel;
+[ "$AKHOME" ] || export AKHOME=$POSTINSTALL/tmp/anykernel;
 [ "$ANDROID_ROOT" ] || ANDROID_ROOT=/system;
 
 ui_print() {
@@ -210,11 +210,7 @@ setup_env() {
           fi;
         done;
       done;
-      if [ "$propval" ]; then
-        echo "$propval";
-      else
-        echo "";
-      fi;
+      echo "$propval";
     }
   elif [ ! "$(getprop ro.build.type 2>/dev/null)" ]; then
     getprop() {
@@ -492,7 +488,7 @@ ui_print "Installing...";
 # hack to maintain support for anykernel.sh files that weren't updated correctly along with the AK core
 CORE=$(grep -oE 'ak.*core.sh' anykernel.sh);
 [ -f tools/$CORE ] || ln -s $AKHOME/tools/ak*-core.sh $AKHOME/tools/$CORE;
-home=$AKHOME ash anykernel.sh;
+ash anykernel.sh;
 if [ $? != 0 ]; then
   abort;
 fi;
