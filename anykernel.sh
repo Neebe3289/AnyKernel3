@@ -2,7 +2,7 @@
 ## osm0sis @ xda-developers
 
 ### AnyKernel setup
-# begin properties
+# global properties
 properties() { '
 kernel.string=ExampleKernel by osm0sis @ xda-developers
 do.devicecheck=1
@@ -30,5 +30,3 @@ dump_boot;
 
 write_boot;
 ## end boot install
-
-
