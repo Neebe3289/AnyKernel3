@@ -14,6 +14,7 @@ device.name1=begonia
 device.name2=begoniain
 supported.versions=
 supported.patchlevels=
+supported.vendorpatchlevels=
 '; } # end properties
 
 ## boot shell variables
