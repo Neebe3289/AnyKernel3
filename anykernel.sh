@@ -43,6 +43,8 @@ romsign() {
 
 # boot shell variables
 BLOCK=/dev/block/platform/bootdevice/by-name/boot;
+PATCH_VBMETA_FLAG=auto;
+NO_MAGISK_CHECK=1;
 
 if romsign; then
     BLOCK=boot;
