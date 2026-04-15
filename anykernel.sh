@@ -17,59 +17,55 @@ supported.patchlevels=
 supported.vendorpatchlevels=
 '; } # end properties
 
-# Kernel installer setup for specific ROM's build.
-# Fix/restore bundled LKM (Loadable Kernel Module) provided by Timjosten.
-# Fixing issue such as vibration, zram, etc. that may break or not work after installing a oss/custom kernel.
+# Kernel installer setup for specific builds.
+# Automatically detect specific ROM build signatures.
+# Restore bundled native Loadable Kernel Module (LKM) in Timjosten ROMs
+# To fixing issue such as vibration, zram that may break or not work after installing a custom kernel.
 romsign() {
-   local prop=""
-   local cr_version="ro.crdroid.build.version"
-   local evo_version="ro.evolution.build.version"
-
    for path in /system_root/system/build.prop /system/build.prop; do
       if [ -f "$path" ]; then
-         prop="$path"
-         break
+         if grep -qE "ro.crdroid.build.version|ro.evolution.build.version" "$path" && grep -q "timjosten" "$path"; then
+            return 0
+         fi
       fi
    done
-
-   [ -z "$prop" ] && return 1
-
-   if grep -qE "$cr_version|$evo_version" "$prop" && grep -q "timjosten" "$prop"; then
-      return 0
-   else
-      return 1
-   fi
+   return 1
 }
 
 # boot shell variables
 BLOCK=/dev/block/platform/bootdevice/by-name/boot;
+IS_SLOT_DEVICE=auto;
+PATCH_VBMETA_FLAG=auto;
 
 if romsign; then
     BLOCK=boot;
-    IS_SLOT_DEVICE=auto;
     RAMDISK_COMPRESSION=none;
+    NO_MAGISK_CHECK=1;
 
     . tools/ak3-core.sh;
 
     ui_print " ";
-    ui_print "Timjosten ROM's detected...";
-    ui_print "Applying fix for vibration, zram, etc.";
+    ui_print "Timjosten ROM detected...";
+    ui_print "Applying vibration, zram fixes...";
 
     split_boot;
-    patch_cmdline initcall_blacklist initcall_blacklist=
+    patch_cmdline initcall_blacklist initcall_blacklist=;
     flash_boot;
 
     ui_print " ";
-    ui_print "Installing successfully...";
+    ui_print "Installation completed.";
 else
-    IS_SLOT_DEVICE=0;
     RAMDISK_COMPRESSION=auto;
 
     . tools/ak3-core.sh;
+
+    ui_print " ";
+    ui_print "Installing kernel...";
 
     dump_boot;
     write_boot;
 
     ui_print " ";
-    ui_print "Installing successfully...";
+    ui_print "Installation completed.";
 fi
+
