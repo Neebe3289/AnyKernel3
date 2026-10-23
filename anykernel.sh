@@ -17,51 +17,17 @@ supported.patchlevels=
 supported.vendorpatchlevels=
 '; } # end properties
 
-# Kernel installer setup for specific builds.
-# Automatically detect specific ROM build signatures
-# and restore bundled native Loadable Kernel Module (LKM) on Timjosten build
-# to fixing issue such as vibration, zram that may break or not work after installing a custom kernel.
-romsign() {
-    for path in /system_root/system/build.prop /system/build.prop; do
-        if [ -f "$path" ]; then
-            if grep -qE "ro.crdroid.build.version|ro.evolution.build.version" "$path" && grep -q "timjosten" "$path"; then
-                return 0;
-            fi;
-        fi;
-    done;
-    return 1;
-}
-
 # boot shell variables
 BLOCK=/dev/block/platform/bootdevice/by-name/boot;
-IS_SLOT_DEVICE=auto;
+IS_SLOT_DEVICE=0;
+RAMDISK_COMPRESSION=auto;
 PATCH_VBMETA_FLAG=auto;
 
-if romsign; then
-    BLOCK=boot;
-    RAMDISK_COMPRESSION=none;
-    NO_MAGISK_CHECK=1;
+# import functions/variables and setup patching - see for reference (DO NOT REMOVE)
+. tools/ak3-core.sh;
 
-    . tools/ak3-core.sh;
+# boot install
+dump_boot;
 
-    ui_print " ";
-    ui_print "Timjosten ROM's detected...";
-    ui_print "Applying fix for vibration, zram, etc.";
-
-    split_boot;
-    patch_cmdline initcall_blacklist initcall_blacklist=;
-    flash_boot;
-
-    ui_print " ";
-    ui_print "Installing successfully...";
-else
-    RAMDISK_COMPRESSION=auto;
-
-    . tools/ak3-core.sh;
-
-    dump_boot;
-    write_boot;
-
-    ui_print " ";
-    ui_print "Installing successfully...";
-fi;
+write_boot;
+## end boot install
