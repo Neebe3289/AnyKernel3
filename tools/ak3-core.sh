@@ -544,7 +544,7 @@ flash_generic() {
   done;
 
   if [ "$img" -a ! -f ${1}_flashed ]; then
-    for path in /dev/block/bootdevice/by-name /dev/block/mapper /dev/block/platform/bootdevice/by-name; do
+    for path in /dev/block/platform/bootdevice/by-name /dev/block/bootdevice/by-name /dev/block/mapper; do
       for file in $1 $1$SLOT; do
         if [ -e $path/$file ]; then
           imgblock=$path/$file;
